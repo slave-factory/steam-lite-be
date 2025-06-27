@@ -1,5 +1,6 @@
 package com.steam_lite.service;
 
+import com.steam_lite.dto.user.UserLoginRequest;
 import com.steam_lite.exception.CustomException;
 import com.steam_lite.exception.ErrorCode;
 import com.steam_lite.domain.user.User; // User 엔티티 임포트
@@ -39,6 +40,17 @@ public class UserService {
 
         // 5. 엔티티를 응답 DTO로 변환하여 반환
         return UserResponse.from(savedUser);
+    }
+
+    // POST api/login
+    public UserResponse login(UserLoginRequest request) {
+        User user = userRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new CustomException(ErrorCode.INVALID_PASSWORD);
+        }
+
+        return UserResponse.from(user);
     }
 
     // GET /api/user/{user_id}

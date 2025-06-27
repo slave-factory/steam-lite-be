@@ -1,5 +1,6 @@
 package com.steam_lite.controller;
 
+import com.steam_lite.dto.user.UserLoginRequest;
 import com.steam_lite.dto.user.UserSignUpRequest;
 import com.steam_lite.dto.user.UserResponse;
 import com.steam_lite.service.UserService;
@@ -19,6 +20,12 @@ public class UserController {
     public ResponseEntity<UserResponse> signUp(@Valid @RequestBody UserSignUpRequest request) {
         UserResponse response = userService.signUp(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<UserResponse> login(@Valid @RequestBody UserLoginRequest request) {
+        UserResponse response = userService.login(request);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/user/{userId}") // GET api/user/{user_id}
