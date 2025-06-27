@@ -1,6 +1,7 @@
 package com.steam_lite.controller;
 
 import com.steam_lite.dto.user.UserLoginRequest;
+import com.steam_lite.dto.user.UserProfileUpdateRequest;
 import com.steam_lite.dto.user.UserSignUpRequest;
 import com.steam_lite.dto.user.UserResponse;
 import com.steam_lite.service.UserService;
@@ -28,10 +29,19 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/user/{userId}") // GET api/user/{user_id}
+    @GetMapping("/users/{userId}") // GET api/users/{user_id}
     public ResponseEntity<UserResponse> getUserProfile(
             @PathVariable Long userId) {
         UserResponse response = userService.getUserProfile(userId);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/users/{userId}")
+    public ResponseEntity<UserResponse> updateUserProfile(
+            @PathVariable Long userId,
+            @Valid @RequestBody UserProfileUpdateRequest request
+    ){
+        UserResponse response = userService.updateUserProfile(userId, request);
         return ResponseEntity.ok(response);
     }
 }

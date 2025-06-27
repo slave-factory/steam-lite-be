@@ -1,6 +1,7 @@
 package com.steam_lite.service;
 
 import com.steam_lite.dto.user.UserLoginRequest;
+import com.steam_lite.dto.user.UserProfileUpdateRequest;
 import com.steam_lite.exception.CustomException;
 import com.steam_lite.exception.ErrorCode;
 import com.steam_lite.domain.user.User; // User 엔티티 임포트
@@ -42,7 +43,7 @@ public class UserService {
         return UserResponse.from(savedUser);
     }
 
-    // POST api/login
+    // POST /api/login
     public UserResponse login(UserLoginRequest request) {
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -53,7 +54,7 @@ public class UserService {
         return UserResponse.from(user);
     }
 
-    // GET /api/user/{user_id}
+    // GET /api/users/{user_id}
     public UserResponse getUserProfile(Long userId) {
         // user_id로 User 엔티티 조회
         User user = userRepository.findById(userId) // purchasedGames 제거했으므로 findById 사용
@@ -67,35 +68,30 @@ public class UserService {
         return UserResponse.from(user);
     }
 
-    // 기타 사용자 정보 업데이트/변경 로직은 추후 필요시 Service 내부에 구현
-    // 예:
-    /*
+    // PUT /api/users/{user_id}
     @Transactional
-    public UserResponse updateUserInfo(Long userId, String newUsername, String newProfileImageUrl, UserStatus newStatus) {
+    public UserResponse updateUserProfile(Long userId, UserProfileUpdateRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        // 필드 변경 로직 (User 엔티티의 @Setter 필요)
-        if (newUsername != null && !newUsername.isBlank() && !user.getUsername().equals(newUsername)) {
-            if (userRepository.existsByUsername(newUsername)) {
+        if(request.getUsername() != null && !request.getUsername().isBlank()){
+            if(!user.getUsername().equals(request.getUsername()) && userRepository.existsByUsername(request.getUsername())){
                 throw new CustomException(ErrorCode.DUPLICATE_USERNAME);
             }
-            user.setUsername(newUsername);
+            user.setUsername(request.getUsername());
         }
-        if (newProfileImageUrl != null) {
-            user.setProfileImageUrl(newProfileImageUrl);
+
+        if(request.getEmail() != null && !request.getEmail().isBlank()){
+            if(!user.getEmail().equals(request.getEmail()) && userRepository.existsByEmail(request.getEmail())){
+                throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
+            }
+            user.setEmail(request.getEmail());
         }
-        if (newStatus != null) {
-            user.setStatus(newStatus);
+
+        if(request.getProfileImageUrl() != null){
+            user.setProfileImageUrl(request.getProfileImageUrl());
         }
+
         return UserResponse.from(user);
     }
-
-    @Transactional
-    public void changeUserPassword(Long userId, String newPassword) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        user.setPassword(passwordEncoder.encode(newPassword));
-    }
-    */
 }
