@@ -2,6 +2,7 @@ package com.steam_lite.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.steam_lite.domain.user.User; // User 엔티티 임포트
+import com.steam_lite.domain.user.UserRole;
 import com.steam_lite.domain.user.UserStatus; // UserStatus 임포트
 import lombok.*;
 
@@ -19,6 +20,7 @@ public class UserResponse {
     private String username;
     private String email;
     private String profileImageUrl;
+    private UserRole role;
     private UserStatus status;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime createdAt;
@@ -37,6 +39,7 @@ public class UserResponse {
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .profileImageUrl(user.getProfileImageUrl())
+                .role(user.getRole())
                 .status(user.getStatus())
                 .createdAt(user.getCreatedAt())
                 // .purchasedGames(purchasedGames) // 필드 제거

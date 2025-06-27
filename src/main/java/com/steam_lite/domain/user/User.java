@@ -35,6 +35,10 @@ public class User extends BaseTimeEntity {
     private String profileImageUrl;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
+    private UserRole role; // USER | ADMIN
+
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private UserStatus status; // ONLINE | OFFLINE | AWAY
 
