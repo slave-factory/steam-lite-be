@@ -1,6 +1,7 @@
 package com.steam_lite.dto.user;
 
 import com.steam_lite.domain.user.User; // User 엔티티 임포트
+import com.steam_lite.domain.user.UserRole;
 import com.steam_lite.domain.user.UserStatus; // UserStatus 임포트
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -32,6 +33,7 @@ public class UserSignUpRequest {
                 .username(this.username)
                 .email(this.email)
                 .password(passwordEncoder.encode(this.password)) // 비밀번호 암호화
+                .role(UserRole.USER)
                 .status(UserStatus.OFFLINE) // 초기 상태 OFFLINE
                 .profileImageUrl(null) // 초기 프로필 이미지 없음
                 .build();

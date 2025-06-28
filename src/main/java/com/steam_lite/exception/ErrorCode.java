@@ -17,6 +17,8 @@ public enum ErrorCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "U001", "User Not Found"),
     DUPLICATE_EMAIL(HttpStatus.CONFLICT, "U002", "Email is already in use"),
     DUPLICATE_USERNAME(HttpStatus.CONFLICT, "U003", "Username is already in use"),
+    INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "U004", "Invalid Password"),
+    INVALID_REQUEST_BODY(HttpStatus.BAD_REQUEST, "U005", "Invalid Request Body"),
     ;
 
     private final HttpStatus status;
