@@ -36,7 +36,7 @@ public class User extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
-    private UserRole role; // USER | ADMIN
+    private UserRole role; // GUEST | USER | ADMIN
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
