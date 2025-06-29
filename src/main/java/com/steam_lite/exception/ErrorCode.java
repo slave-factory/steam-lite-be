@@ -17,6 +17,9 @@ public enum ErrorCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "U001", "User Not Found"),
     DUPLICATE_EMAIL(HttpStatus.CONFLICT, "U002", "Email is already in use"),
     DUPLICATE_USERNAME(HttpStatus.CONFLICT, "U003", "Username is already in use"),
+
+    //Game
+    CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "C005", "Category Not Found"),
     ;
 
     private final HttpStatus status;

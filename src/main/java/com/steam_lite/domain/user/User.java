@@ -37,7 +37,6 @@ public class User extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private UserStatus status; // ONLINE | OFFLINE | AWAY
-
     // 'purchased_games' 등 다른 엔티티와의 관계는 현재 구현 범위에서 제외하고, 나중에 필요시 추가.
     // @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     // @Builder.Default
