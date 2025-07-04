@@ -23,12 +23,6 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<UserResponse> login(@Valid @RequestBody UserLoginRequest request) {
-        UserResponse response = userService.login(request);
-        return ResponseEntity.ok(response);
-    }
-
     @GetMapping("/users/{userId}") // GET api/users/{user_id}
     public ResponseEntity<UserResponse> getUserProfile(
             @PathVariable Long userId) {
