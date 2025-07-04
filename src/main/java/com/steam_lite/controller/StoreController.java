@@ -16,10 +16,10 @@ public class StoreController {
 
     private final StoreService storeService;
 
-    @GetMapping("/store")
-    public ResponseEntity<List<StoreResponse>> getStore() {
-        return ResponseEntity.ok(this.storeService.store());
-    }
+//    @GetMapping("/store")
+//    public ResponseEntity<List<StoreResponse>> getStore() {
+//        return ResponseEntity.ok(this.storeService.store());
+//    }
 
     @GetMapping("/store/{gameId}")
     public ResponseEntity<GameResponse> getGame(@PathVariable Long gameId) {

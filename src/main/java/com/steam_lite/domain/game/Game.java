@@ -1,5 +1,6 @@
 package com.steam_lite.domain.game;
 
+import com.steam_lite.domain.BaseTimeEntity;
 import com.steam_lite.domain.user.UserRole;
 import com.steam_lite.domain.user.UserStatus;
 import jakarta.persistence.*;
@@ -15,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class Game {
+public class Game extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id") // ERD에 명시된 컬럼명

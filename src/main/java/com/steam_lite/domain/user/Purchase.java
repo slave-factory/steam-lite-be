@@ -3,6 +3,9 @@ package com.steam_lite.domain.user;
 import com.steam_lite.domain.game.Game;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "purchases") // ERD에 명시된 테이블 이름
@@ -34,6 +37,10 @@ public class Purchase {
 
     @Column(name = "provider", length = 50)
     private String provider;
+
+    @CreatedDate
+    @Column(name = "paid_at", updatable = false)
+    private LocalDateTime paidAt;
 
     @Column(name = "payment_status", nullable = false, length = 20)
     private String paymentStatus;

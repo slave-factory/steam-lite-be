@@ -1,5 +1,6 @@
 
 application.yaml
+application.properties
 HELP.md
 .gradle
 build/
