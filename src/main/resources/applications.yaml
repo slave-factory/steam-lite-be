@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver # JDBC driver class name for MySQL
+    url: jdbc:mysql://localhost:3306/your_database_name?serverTimezone=Asia/Seoul&characterEncoding=UTF-8 # Database URL (replace 'your_database_name')
+    username: 1111 # Database username
+    password: 1111 # Database password
+  jpa:
+    hibernate:
+      ddl-auto: update # Hibernate DDL auto-update mode: 'update', 'none', or 'validate'
+    show-sql: true # Enable logging of SQL statements to the console
+    properties:
+      hibernate:
+        format_sql: true # Format the SQL statements for readability
+    open-in-view: false # Disable Open Session in View_pattern to prevent Lazy Loading issues (recommended)
+server:
+  port: 8080 # Port for the embedded server
+logging:
+  level:
+    org.hibernate.SQL: debug # Set logging level for Hibernate SQL statements
+    org.hibernate.orm.jdbc.bind: trace # Set logging level for Hibernate parameter binding
+    com.steam_lite: debug # Set logging_level for your application's package

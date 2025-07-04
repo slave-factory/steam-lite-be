@@ -3,6 +3,9 @@ import com.steam_lite.domain.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 // 구매한 게임 목록(`purchased_games`)은 현재 구현 범위에서 제외하고, 추후 필요할 때 관계 설정 및 엔티티 추가
 // import com.yourcompany.yourproject.domain.user_game.UserGame;
 // import java.util.ArrayList;
@@ -41,6 +44,12 @@ public class User extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private UserStatus status; // ONLINE | OFFLINE | AWAY
+
+    @OneToMany(mappedBy = "libraryUserId")
+    private List<Library> libraries = new ArrayList<>();
+
+    @OneToMany(mappedBy = "userId")
+    private List<Purchase> purchases = new ArrayList<>();
 
     // 'purchased_games' 등 다른 엔티티와의 관계는 현재 구현 범위에서 제외하고, 나중에 필요시 추가.
     // @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
