@@ -2,6 +2,7 @@ package com.steam_lite.service;
 
 import com.steam_lite.domain.game.Category;
 import com.steam_lite.domain.game.Game;
+import com.steam_lite.domain.game.GameCategories;
 import com.steam_lite.dto.game.GameResponse;
 import com.steam_lite.dto.game.StoreResponse;
 import com.steam_lite.repository.CategoryRepository;
@@ -34,16 +35,17 @@ public class StoreService {
     public List<GameResponse> getGames(String name, String category) {
         Category category1;
         if(category != null && !category.isBlank()){
-            category1=this.categoryRepository.findByName(category).get();
+            category1=this.categoryRepository.findByName(GameCategories.valueOf(category)).get();
         }else {
             category1=null;
         }
+        System.out.println(category+" sldkfjlskdfjk");
         if(name != null && !name.isBlank() && category1 != null){
             return this.storeRepository.findByTitleAndCategories(name, category1).stream().map(GameResponse::from).toList();
         }else if(name != null && !name.isBlank() && category1 == null){
             return this.storeRepository.findByTitle(name).stream().map(GameResponse::from).toList();
         }else if((name == null || name.isBlank()) && category1 != null) {
-            return this.storeRepository.findByCategories(category1).stream().map(GameResponse::from).toList();
+            return GameResponse.from(this.storeRepository.findByCategories(category1));
         }else {
             return this.storeRepository.findAll().stream().map(GameResponse::from).toList();
         }

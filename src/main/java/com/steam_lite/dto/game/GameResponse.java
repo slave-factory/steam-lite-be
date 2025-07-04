@@ -8,6 +8,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,7 +23,7 @@ public class GameResponse {
     private int price;
     private String thumbnailUrl;
     private int fileSize;
-    private int ratingAvg;
+    private double ratingAvg;
     private int reviewCount;
 
 
@@ -33,9 +36,27 @@ public class GameResponse {
                 .price(game.getPrice())
                 .thumbnailUrl(game.getThumbnailUrl())
                 .fileSize(0)
-                .ratingAvg(game.getReviews().isEmpty() ? 0 : (int) Math.round(game.getReviews().stream().mapToDouble(Review::getRating).sum()))
+                .ratingAvg(game.getReviews().isEmpty() ? 0 : Math.round(game.getReviews().stream().mapToDouble(Review::getRating).sum()/game.getReviews().size()*100)/100.0)
                 .reviewCount(game.getReviews().size())
                 .build();
 
+    }
+
+    public static List<GameResponse> from(List<Game> games) {
+        List<GameResponse> result = new ArrayList<>();
+        for (Game game : games) {
+           result.add(GameResponse.builder()
+                   .gameId(game.getGamePK().toString())
+                   .title(game.getTitle())
+                   .description(game.getDescription() != null ? game.getDescription() : "")
+                   .category(game.getCategories().stream().map(Category::getName).toList().toString())
+                   .price(game.getPrice())
+                   .thumbnailUrl(game.getThumbnailUrl())
+                   .fileSize(0)
+                   .ratingAvg(game.getReviews().isEmpty() ? 0 : Math.round(game.getReviews().stream().mapToDouble(Review::getRating).sum()/game.getReviews().size()*100)/100.0)
+                   .reviewCount(game.getReviews().size())
+                   .build());
+        }
+        return result;
     }
 }
