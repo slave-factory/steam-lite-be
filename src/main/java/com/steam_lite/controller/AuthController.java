@@ -41,10 +41,14 @@ public class AuthController {
                 List.of(new SimpleGrantedAuthority(user.getRole().getAuthority()))
         );
 
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
         session.setAttribute(
                 HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
                 SecurityContextHolder.getContext()
         );
+
+        session.setAttribute("LOGIN_USER_ID", user.getId());
 
         return ResponseEntity.ok(response);
     }
@@ -55,8 +59,7 @@ public class AuthController {
         return ResponseEntity.noContent().build(); // 204 No Content
     }
 
-    // TODO: 왜? 403?
-    // 세션 검증용인데.. 왜 작동을 안하남..
+    // 세션 테스트용
     @GetMapping("/session-check")
     public ResponseEntity<String> sessionCheck(HttpServletRequest request) {
 
