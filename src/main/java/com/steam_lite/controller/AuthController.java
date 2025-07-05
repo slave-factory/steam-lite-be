@@ -13,8 +13,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
@@ -65,11 +67,20 @@ public class AuthController {
 
         HttpSession session = request.getSession(false);
 
-        if (session == null || session.getAttribute("LOGIN_USER_ID") == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("세션이 만료되었거나 존재하지 않습니다.");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if(session == null || auth == null || !auth.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("세션만료");
         }
-        return ResponseEntity.ok("세션 유효: 로그인한 사용자 ID = " +
-                session.getAttribute("LOGIN_USER_ID"));
+
+        boolean isGuest = auth.getAuthorities().stream().anyMatch(a-> a.getAuthority().equals("ROLE_GUEST"));
+
+        if(isGuest) return ResponseEntity.ok("비로그인 사용자입니다. ROLE = " + auth.getAuthorities().stream().findFirst().get().getAuthority());
+
+        CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
+
+        String returnString = "로그인한 사용자 ID = " + userDetails.getUser().getId() + "\n" + "로그인한 사용자 ROLE = " + userDetails.getAuthorities();
+
+        return ResponseEntity.ok(returnString);
     }
 }
