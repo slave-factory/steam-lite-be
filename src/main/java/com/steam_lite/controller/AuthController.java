@@ -50,8 +50,6 @@ public class AuthController {
                 SecurityContextHolder.getContext()
         );
 
-        session.setAttribute("LOGIN_USER_ID", user.getId());
-
         return ResponseEntity.ok(response);
     }
 
