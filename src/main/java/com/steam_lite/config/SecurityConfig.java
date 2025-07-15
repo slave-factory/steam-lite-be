@@ -1,12 +1,17 @@
 package com.steam_lite.config;
 
+import com.steam_lite.security.GuestSessionFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 
 @Configuration
@@ -14,20 +19,27 @@ import org.springframework.security.web.header.writers.frameoptions.XFrameOption
 public class SecurityConfig {
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // 비밀번호 암호화에 사용할 BCryptPasswordEncoder 빈 등록
+    public PasswordEncoder passwordEncoder() { // 비밀번호 암호화용 Bean
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception { // 스프링 시큐리티 HTTP 보안 설정
         http
-                 // REST API이므로 CSRF 보호 비활성화
-                .authorizeHttpRequests(authorize -> authorize
-                        .anyRequest().permitAll() // 모든 요청을 인증 없이 허용 (인증/권한 스킵)
-                ).csrf(csrf -> csrf.disable())
+                .anonymous(anonymous -> anonymous.principal("guest").authorities("ROLE_GUEST")) // 로그인하지 않은 사용자는 ROLE_GUEST
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/signup", "/api/login", "/api/logout", "/api/session-check").permitAll()
+                        .anyRequest().authenticated())
                 .headers((headers) -> headers.addHeaderWriter(new XFrameOptionsHeaderWriter(XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)))
-        ;
-
+                .formLogin(login -> login.disable())
+                .httpBasic(basic -> basic.disable())
+                .addFilterAfter(new GuestSessionFilter(), AnonymousAuthenticationFilter.class);
         return http.build();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 }
