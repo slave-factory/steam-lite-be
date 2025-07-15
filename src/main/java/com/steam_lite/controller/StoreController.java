@@ -47,5 +47,6 @@ public class StoreController {
     public ResponseEntity<GameUploadResponse> gameUpload(@Valid @RequestBody GameUploadRequest request) {
         GameUploadResponse response = this.storeService.getGameUpload(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+
     }
 }
