@@ -1,6 +1,5 @@
 package com.steam_lite.config;
 
-import com.steam_lite.security.GuestSessionFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -11,7 +10,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 
 @Configuration
@@ -31,10 +29,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/signup", "/api/login", "/api/logout", "/api/session-check").permitAll()
                         .anyRequest().authenticated())
+                .sessionManagement(session -> session.sessionFixation().migrateSession())
                 .headers((headers) -> headers.addHeaderWriter(new XFrameOptionsHeaderWriter(XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)))
                 .formLogin(login -> login.disable())
-                .httpBasic(basic -> basic.disable())
-                .addFilterAfter(new GuestSessionFilter(), AnonymousAuthenticationFilter.class);
+                .httpBasic(basic -> basic.disable());
+
         return http.build();
     }
 
