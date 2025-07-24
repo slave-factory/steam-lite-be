@@ -3,16 +3,16 @@ package com.steam_lite.service;
 import com.steam_lite.domain.game.Category;
 import com.steam_lite.domain.game.Game;
 import com.steam_lite.domain.game.GameCategories;
-import com.steam_lite.dto.game.GameResponse;
-import com.steam_lite.dto.game.GameUploadRequest;
-import com.steam_lite.dto.game.GameUploadResponse;
-import com.steam_lite.dto.game.StoreResponse;
+import com.steam_lite.dto.game.*;
+import com.steam_lite.exception.CustomException;
+import com.steam_lite.exception.ErrorCode;
 import com.steam_lite.repository.CategoryRepository;
 import com.steam_lite.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -73,5 +73,38 @@ public class StoreService {
         savedGame.setCategories(categories);
         savedGame = storeRepository.save(savedGame);
         return GameUploadResponse.from(savedGame);
+    }
+
+    @Transactional
+    public void updateGame(Long gameId, GameUpdateRequest request) {
+        Optional<Game> selectedGame = this.storeRepository.findById(gameId);
+
+        // 수정하려는 게임 존재 여부 확인
+        if (selectedGame.isPresent()) {
+            if (request.getTitle() != null) {
+                selectedGame.get().setTitle(request.getTitle());
+            }
+            if (request.getDescription() != null) {
+                selectedGame.get().setDescription(request.getDescription());
+            }
+            if (request.getPrice() != null) {
+                selectedGame.get().setPrice(request.getPrice());
+            }
+        }
+        else {
+            throw new CustomException(ErrorCode.GAME_NOT_FOUND);
+        }
+    }
+
+    @Transactional
+    public void deleteGame(Long gameId) {
+        Optional<Game> selectedGame = this.storeRepository.findById(gameId);
+
+        if (selectedGame.isPresent()) {
+            storeRepository.delete(selectedGame.get());
+        }
+        else {
+            throw new CustomException(ErrorCode.GAME_NOT_FOUND);
+        }
     }
 }

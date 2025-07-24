@@ -1,9 +1,6 @@
 package com.steam_lite.controller;
 
-import com.steam_lite.dto.game.GameResponse;
-import com.steam_lite.dto.game.GameUploadRequest;
-import com.steam_lite.dto.game.GameUploadResponse;
-import com.steam_lite.dto.game.StoreResponse;
+import com.steam_lite.dto.game.*;
 import com.steam_lite.service.StoreService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +44,17 @@ public class StoreController {
     public ResponseEntity<GameUploadResponse> gameUpload(@Valid @RequestBody GameUploadRequest request) {
         GameUploadResponse response = this.storeService.getGameUpload(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
 
+    @PutMapping("/store/games/{gameId}")
+    public ResponseEntity<Void> updateGame(@PathVariable Long gameId, @RequestBody GameUpdateRequest request) {
+        this.storeService.updateGame(gameId, request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/store/games/{gameId}")
+    public ResponseEntity<Void> deleteGame(@PathVariable Long gameId) {
+        this.storeService.deleteGame(gameId);
+        return ResponseEntity.noContent().build();
     }
 }
