@@ -51,7 +51,13 @@ public class StoreService {
     // POST /api/store/game
     @Transactional
     public GameCreateResponse createGame(GameCreateRequest request) {
-        Category category = Category.valueOf(request.getCategory().toUpperCase());
+        Category category;
+
+        try{
+            category = Category.valueOf(request.getCategory().toUpperCase());
+        }catch (IllegalArgumentException e){
+            throw new CustomException(ErrorCode.INVALID_CATEGORY);
+        }
 
         Game game = Game.builder()
                 .title(request.getTitle())
