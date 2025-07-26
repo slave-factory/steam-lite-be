@@ -28,6 +28,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/signup", "/api/login", "/api/logout", "/api/session-check").permitAll()
+                        .requestMatchers("/api/store", "/api/store/game", "/api/store/{gameId}").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionFixation().migrateSession())
                 .headers((headers) -> headers.addHeaderWriter(new XFrameOptionsHeaderWriter(XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)))

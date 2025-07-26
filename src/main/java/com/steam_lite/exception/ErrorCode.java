@@ -19,6 +19,7 @@ public enum ErrorCode {
     DUPLICATE_USERNAME(HttpStatus.CONFLICT, "U003", "Username is already in use"),
     INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "U004", "Invalid Password"),
     INVALID_REQUEST_BODY(HttpStatus.BAD_REQUEST, "U005", "Invalid Request Body"),
+    GAME_NOT_FOUND(HttpStatus.NOT_FOUND, "U006", "Game Not Found"),
     ;
 
     private final HttpStatus status;

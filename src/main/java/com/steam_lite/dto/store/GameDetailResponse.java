@@ -11,24 +11,36 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class GameListResponse {
-
+public class GameDetailResponse {
     @JsonProperty("game_id")
     private String gameId;
     private String title;
+    private String description;
     private String category;
     private Integer price;
-
     @JsonProperty("thumbnail_url")
     private String thumbnailUrl;
 
-    public static GameListResponse from(Game game){
-        return GameListResponse.builder()
+    @JsonProperty("file_size")
+    private Integer fileSize;
+
+    @JsonProperty("rating_avg")
+    private Double ratingAvg;
+
+    @JsonProperty("review_count")
+    private Integer reviewCount;
+
+    public static GameDetailResponse from(Game game){
+        return GameDetailResponse.builder()
                 .gameId(String.valueOf(game.getId()))
                 .title(game.getTitle())
+                .description(game.getDescription())
                 .category(game.getCategory().name())
                 .price(game.getPrice())
                 .thumbnailUrl(game.getThumbnailUrl())
+                .fileSize(0)
+                .ratingAvg(0.0)
+                .reviewCount(0)
                 .build();
     }
 }
