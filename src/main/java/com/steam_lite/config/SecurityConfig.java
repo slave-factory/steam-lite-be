@@ -2,6 +2,7 @@ package com.steam_lite.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -28,7 +29,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/signup", "/api/login", "/api/logout", "/api/session-check").permitAll()
-                        .requestMatchers("/api/store", "/api/store/game", "/api/store/{gameId}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/store", "/api/store/game", "/api/store/{gameId}").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/store/game").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionFixation().migrateSession())
                 .headers((headers) -> headers.addHeaderWriter(new XFrameOptionsHeaderWriter(XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)))

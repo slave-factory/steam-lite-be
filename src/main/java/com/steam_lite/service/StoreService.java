@@ -2,6 +2,8 @@ package com.steam_lite.service;
 
 import com.steam_lite.domain.store.Category;
 import com.steam_lite.domain.store.Game;
+import com.steam_lite.dto.store.GameCreateRequest;
+import com.steam_lite.dto.store.GameCreateResponse;
 import com.steam_lite.dto.store.GameDetailResponse;
 import com.steam_lite.dto.store.GameListResponse;
 import com.steam_lite.exception.CustomException;
@@ -44,5 +46,24 @@ public class StoreService {
             results = gameRepository.findAll();
         }
         return results.stream().map(GameListResponse::from).toList();
+    }
+
+    // POST /api/store/game
+    @Transactional
+    public GameCreateResponse createGame(GameCreateRequest request) {
+        Category category = Category.valueOf(request.getCategory().toUpperCase());
+
+        Game game = Game.builder()
+                .title(request.getTitle())
+                .description(request.getDescription())
+                .category(category)
+                .price(request.getPrice())
+                .downloadUrl(request.getDownloadUrl())
+                .thumbnailUrl(request.getThumbnailUrl())
+                .build();
+
+        Game savedGame = gameRepository.save(game);
+
+        return GameCreateResponse.from(savedGame);
     }
 }
