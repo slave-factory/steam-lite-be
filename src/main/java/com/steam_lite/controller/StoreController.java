@@ -1,12 +1,10 @@
 package com.steam_lite.controller;
 
 import com.steam_lite.domain.store.Category;
-import com.steam_lite.dto.store.GameCreateRequest;
-import com.steam_lite.dto.store.GameCreateResponse;
-import com.steam_lite.dto.store.GameDetailResponse;
-import com.steam_lite.dto.store.GameListResponse;
+import com.steam_lite.dto.store.*;
 import com.steam_lite.service.StoreService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,4 +36,19 @@ public class StoreController {
     public GameCreateResponse createGame(@RequestBody GameCreateRequest request) {
         return storeService.createGame(request);
     }
+
+    @PutMapping("/{gameId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> updateGame(@PathVariable Long gameId, @RequestBody GameUpdateRequest request) {
+        storeService.updateGame(gameId, request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{gameId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> deleteGame(@PathVariable Long gameId) {
+        storeService.deleteGame(gameId);
+        return ResponseEntity.noContent().build();
+    }
+
 }

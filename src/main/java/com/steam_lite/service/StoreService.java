@@ -2,10 +2,7 @@ package com.steam_lite.service;
 
 import com.steam_lite.domain.store.Category;
 import com.steam_lite.domain.store.Game;
-import com.steam_lite.dto.store.GameCreateRequest;
-import com.steam_lite.dto.store.GameCreateResponse;
-import com.steam_lite.dto.store.GameDetailResponse;
-import com.steam_lite.dto.store.GameListResponse;
+import com.steam_lite.dto.store.*;
 import com.steam_lite.exception.CustomException;
 import com.steam_lite.exception.ErrorCode;
 import com.steam_lite.repository.GameRepository;
@@ -14,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -71,5 +69,23 @@ public class StoreService {
         Game savedGame = gameRepository.save(game);
 
         return GameCreateResponse.from(savedGame);
+    }
+
+    @Transactional
+    public void updateGame(Long gameId, GameUpdateRequest request) {
+        Game game = gameRepository.findById(gameId)
+                .orElseThrow(() -> new CustomException(ErrorCode.GAME_NOT_FOUND));
+
+        game.setTitle(request.getTitle());
+        game.setDescription(request.getDescription());
+        game.setPrice(request.getPrice());
+    }
+
+    @Transactional
+    public void deleteGame(Long gameId) {
+        Game game = gameRepository.findById(gameId)
+                .orElseThrow(() -> new CustomException(ErrorCode.GAME_NOT_FOUND));
+
+        gameRepository.delete(game);
     }
 }
