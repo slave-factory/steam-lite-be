@@ -5,6 +5,8 @@ import com.steam_lite.dto.store.GameCreateRequest;
 import com.steam_lite.dto.store.GameCreateResponse;
 import com.steam_lite.dto.store.GameDetailResponse;
 import com.steam_lite.dto.store.GameListResponse;
+import com.steam_lite.exception.CustomException;
+import com.steam_lite.exception.ErrorCode;
 import com.steam_lite.service.StoreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,8 +31,16 @@ public class StoreController {
     }
 
     @GetMapping
-    public List<GameListResponse> searchGames(@RequestParam(required = false) String name, @RequestParam(required = false) Category category){
-        return storeService.searchGames(name, category);
+    public List<GameListResponse> searchGames(@RequestParam(required = false) String name, @RequestParam(required = false) String category){
+        Category searchCategory = null;
+        if(category != null) {
+            try{
+                searchCategory = Category.valueOf(category.toUpperCase());
+            }catch(IllegalArgumentException e){
+                throw new CustomException(ErrorCode.INVALID_CATEGORY);
+            }
+        }
+        return storeService.searchGames(name, searchCategory);
     }
 
     @PostMapping("/game")

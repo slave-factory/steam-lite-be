@@ -45,6 +45,9 @@ public class StoreService {
         }else{ // 아무것도 없다면
             results = gameRepository.findAll();
         }
+
+        if(results.isEmpty()) throw new CustomException(ErrorCode.GAME_NOT_FOUND);
+
         return results.stream().map(GameListResponse::from).toList();
     }
 
