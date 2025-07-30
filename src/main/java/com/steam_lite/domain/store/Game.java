@@ -35,8 +35,4 @@ public class Game extends BaseTimeEntity {
 
     @Column(name = "thumbnail_url", nullable = false, unique = true)
     private String thumbnailUrl;
-
-    @Builder.Default // 별도로 설정하지 않는다면 기본값은 false
-    @Column(name = "is_deleted", nullable = false)
-    private Boolean isDeleted = false;
 }

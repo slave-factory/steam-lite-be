@@ -37,3 +37,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+# Ignore data.sql
+src/main/resources/data.sql

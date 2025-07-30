@@ -1,6 +1,7 @@
 package com.steam_lite.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.steam_lite.domain.user.User; // User 엔티티 임포트
 import com.steam_lite.domain.user.UserRole;
 import com.steam_lite.domain.user.UserStatus; // UserStatus 임포트
@@ -16,9 +17,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class UserResponse {
+
+    @JsonProperty("user_id")
     private String userId; // API 명세에 string 타입으로 되어 있어 Long -> String 변환
     private String username;
     private String email;
+    @JsonProperty("profile_image_url")
     private String profileImageUrl;
     private UserRole role;
     private UserStatus status;
