@@ -22,7 +22,6 @@ public class UserResponse {
     private String userId; // API 명세에 string 타입으로 되어 있어 Long -> String 변환
     private String username;
     private String email;
-
     @JsonProperty("profile_image_url")
     private String profileImageUrl;
     private UserRole role;
