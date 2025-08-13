@@ -10,13 +10,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class GameUpdateRequest {
 
-    @NotNull(message = "게임 제목을 입력해주세요.")
     private String title;
 
-    @NotNull(message = "게임 설명을 입력해주세요.")
     private String description;
 
-    @NotNull(message = "게임 가격을 입력해주세요.")
     private Integer price;
 
 }

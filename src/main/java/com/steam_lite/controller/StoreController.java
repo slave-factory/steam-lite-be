@@ -44,7 +44,6 @@ public class StoreController {
         return storeService.createGame(request, thumbnail, gameFile);
     }
 
-    // 사용자 인증 부분 구현 필요
     @PutMapping("/{gameId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> updateGame(

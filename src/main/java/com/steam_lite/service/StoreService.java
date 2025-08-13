@@ -6,16 +6,14 @@ import com.steam_lite.dto.store.*;
 import com.steam_lite.exception.CustomException;
 import com.steam_lite.exception.ErrorCode;
 import com.steam_lite.repository.GameRepository;
+import com.steam_lite.dto.s3.FileUploadResponse;
+import com.steam_lite.service.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -50,79 +48,124 @@ public class StoreService {
         }
         return results.stream().map(GameListResponse::from).toList();
     }
-
+    
     // POST /api/store/game
     @Transactional
     public GameCreateResponse createGame(GameCreateRequest request, MultipartFile thumbnail, MultipartFile gameFile) {
         Category category;
+        FileUploadResponse thumbnailInfo = null;
+        FileUploadResponse gameFileInfo = null;
 
         try{
+            // 카테고리 확인
             category = Category.valueOf(request.getCategory().toUpperCase());
-        }catch (IllegalArgumentException e){
+
+            // AWS에 thumbnail과 gameFile 저장
+            thumbnailInfo = s3Service.uploadFile(thumbnail);
+            gameFileInfo = s3Service.uploadFile(gameFile);
+
+            // DB에 게임에 대한 메타 데이터 저장
+            Game game = Game.builder()
+                    .title(request.getTitle())
+                    .description(request.getDescription())
+                    .category(category)
+                    .price(request.getPrice())
+                    .thumbnailKey(thumbnailInfo.getKey())
+                    .downloadKey(gameFileInfo.getKey())
+                    .thumbnailUrl(thumbnailInfo.getUrl())
+                    .downloadUrl(gameFileInfo.getUrl())
+                    .build();
+
+            Game savedGame = gameRepository.save(game);
+
+            return GameCreateResponse.from(savedGame);
+        }catch (IllegalArgumentException e) {
             throw new CustomException(ErrorCode.INVALID_CATEGORY);
+        } catch (CustomException e) {
+            if (thumbnailInfo != null) {
+                s3Service.deleteFile(thumbnailInfo.getKey());
+            }
+            if (gameFileInfo != null) {
+                s3Service.deleteFile(gameFileInfo.getKey());
+            }
+            throw e;
         }
-
-        Game game = Game.builder()
-                .title(request.getTitle())
-                .description(request.getDescription())
-                .category(category)
-                .price(request.getPrice())
-                .thumbnailUrl(s3Service.uploadFile(thumbnail))
-                .downloadUrl(s3Service.uploadFile(gameFile))
-                .build();
-
-        Game savedGame = gameRepository.save(game);
-
-        return GameCreateResponse.from(savedGame);
     }
 
+    // Key만 넘기는 방식으로 수정 가능
     // PUT /api/store/{gameId}
     @Transactional
     public void updateGame(Long gameId, GameUpdateRequest request, MultipartFile thumbnail, MultipartFile gameFile) {
         Game game = gameRepository.findById(gameId)
                 .orElseThrow(() -> new CustomException(ErrorCode.GAME_NOT_FOUND));
 
-        // AWS에서 삭제하고 DB에 새로운 URL 생성
-        if (thumbnail != null && !thumbnail.isEmpty()) {
-            s3Service.deleteFile(extractKeyFromUrl(game.getThumbnailUrl()));
-            game.setThumbnailUrl(s3Service.uploadFile(thumbnail));
+        String newThumbnailKey = null;
+        String newDownloadKey = null;
+
+        String oldThumbnailKey = game.getThumbnailKey();
+        String oldDownloadKey = game.getDownloadKey();
+
+        try {
+            if (thumbnail != null && !thumbnail.isEmpty()) {
+                FileUploadResponse thumbnailInfo = s3Service.uploadFile(thumbnail);
+                game.setThumbnailKey(thumbnailInfo.getKey());
+                game.setThumbnailUrl(thumbnailInfo.getUrl());
+                newThumbnailKey = thumbnailInfo.getKey();
+            }
+
+            if (gameFile != null && !gameFile.isEmpty()) {
+                FileUploadResponse gameFileInfo = s3Service.uploadFile(gameFile);
+                game.setDownloadKey(gameFileInfo.getKey());
+                game.setDownloadUrl(gameFileInfo.getUrl());
+                newDownloadKey = gameFileInfo.getKey();
+            }
+
+            if (request != null) {
+                if (request.getTitle() != null) {
+                    game.setTitle(request.getTitle());
+                }
+                if (request.getDescription() != null) {
+                    game.setDescription(request.getDescription());
+                }
+                if (request.getPrice() != null) {
+                    game.setPrice(request.getPrice());
+                }
+            }
+
+        } catch (Exception e) {
+            if (newThumbnailKey != null) {
+                s3Service.deleteFile(newThumbnailKey);
+            }
+            if (newDownloadKey != null) {
+                s3Service.deleteFile(newDownloadKey);
+            }
+            throw e;
         }
 
-        if (gameFile != null && !gameFile.isEmpty()) {
-            s3Service.deleteFile(extractKeyFromUrl(game.getDownloadUrl()));
-            game.setDownloadUrl(s3Service.uploadFile(gameFile));
+        // 이전 파일 삭제
+        if (newThumbnailKey != null && oldThumbnailKey != null) {
+            s3Service.deleteFile(oldThumbnailKey);
         }
-
-        if (request != null) {
-            game.setTitle(request.getTitle());
-            game.setDescription(request.getDescription());
-            game.setPrice(request.getPrice());
+        if (newDownloadKey != null && oldDownloadKey != null) {
+            s3Service.deleteFile(oldDownloadKey);
         }
     }
 
-    //DELETE /api/store/{gameId}
+
+    // DELETE /api/store/{gameId}
     @Transactional
     public void deleteGame(Long gameId) {
         Game game = gameRepository.findById(gameId)
                 .orElseThrow(() -> new CustomException(ErrorCode.GAME_NOT_FOUND));
 
-        s3Service.deleteFile(extractKeyFromUrl(game.getDownloadUrl()));
-        s3Service.deleteFile(extractKeyFromUrl(game.getThumbnailUrl()));
-        gameRepository.delete(game);
-    }
+        String thumbnailKey = game.getThumbnailKey();
+        String downloadKey = game.getDownloadKey();
 
-    // url로부터 key를 얻기 위한 함수
-    // 예외 부분 수정 필요함
-    private String extractKeyFromUrl(String url) {
-        try {
-            URI uri = new URI(url);
-            String path = uri.getPath();
-            if (path.startsWith("/")) {
-                path = path.substring(1);
-            }
-            return path;
-        } catch (URISyntaxException e) {
+        if ((thumbnailKey == null) || (thumbnailKey.isBlank()) || (downloadKey == null) || (downloadKey.isBlank())) {
             throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
         }
+        s3Service.deleteFile(game.getThumbnailKey());
+        s3Service.deleteFile(game.getDownloadKey());
+        gameRepository.delete(game);
     }
 }

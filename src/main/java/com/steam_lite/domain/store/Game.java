@@ -30,6 +30,12 @@ public class Game extends BaseTimeEntity {
     @Column(name = "price", nullable = false)
     private Integer price;
 
+    @Column(name = "thumbnail_key", nullable = false, unique = true)
+    private String thumbnailKey;
+
+    @Column(name = "download_key", nullable = false, unique = true)
+    private String downloadKey;
+
     @Column(name = "download_url", nullable = false, unique = true)
     private String downloadUrl;
 
