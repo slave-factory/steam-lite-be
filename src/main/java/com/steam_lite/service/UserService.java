@@ -95,9 +95,23 @@ public class UserService {
         return UserResponse.from(user);
     }
 
+    //POST /api/users/{user_id}/password
+    @Transactional
+    public UserResponse updatePassword(String username, String currentPassword, String newPassword){
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        if(!passwordEncoder.matches(currentPassword, user.getPassword())){
+            throw new CustomException(ErrorCode.INVALID_PASSWORD);
+        }
+        user.setPassword(passwordEncoder.encode(newPassword));
+        return UserResponse.from(user);
+    }
+
     @Transactional(readOnly = true)
     public User getUserByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
     }
+
+
 }

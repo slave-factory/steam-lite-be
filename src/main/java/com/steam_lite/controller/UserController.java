@@ -1,9 +1,6 @@
 package com.steam_lite.controller;
 
-import com.steam_lite.dto.user.UserLoginRequest;
-import com.steam_lite.dto.user.UserProfileUpdateRequest;
-import com.steam_lite.dto.user.UserSignUpRequest;
-import com.steam_lite.dto.user.UserResponse;
+import com.steam_lite.dto.user.*;
 import com.steam_lite.security.CustomUserDetails;
 import com.steam_lite.service.UserService;
 import jakarta.validation.Valid;
@@ -11,7 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -56,6 +55,13 @@ public class UserController {
         }
 
         UserResponse response = userService.updateUserProfile(userId, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/users/me/password")
+    public ResponseEntity<UserResponse> updateUserPassword(@Validated @RequestBody UpdatePasswordRequest request, @AuthenticationPrincipal CustomUserDetails principal) {
+        String username = principal.getUsername();
+        UserResponse response = userService.updatePassword(username, request.getOldPassword(), request.getNewPassword());
         return ResponseEntity.ok(response);
     }
 }
